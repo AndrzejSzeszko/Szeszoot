@@ -33,8 +33,10 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # custom
     'app_szeszoot',
-    # django non-defaults
+    # third party
     'channels',
+    'crispy_forms',
+    'betterforms',
     # django defaults
     'django.contrib.admin',
     'django.contrib.auth',
@@ -80,8 +82,11 @@ WSGI_APPLICATION = 'Szeszoot.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'szeszoot',
+        'USER': 'postgres',
+        'PASSWORD': 'coderslab',
+        'HOST': '127.0.0.1',
     }
 }
 
@@ -119,6 +124,11 @@ USE_L10N = True
 USE_TZ = True
 
 
+# Custom user model
+
+AUTH_USER_MODEL = 'app_szeszoot.CustomUser'
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
@@ -143,6 +153,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = 'login'
 
 LOGIN_REDIRECT_URL = 'home'
+
+
+# Crispy forms
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
 # Channels
