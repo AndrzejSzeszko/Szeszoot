@@ -1,0 +1,13 @@
+{% extends 'app_szeszoot/base.html' %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+    <div>
+        <h3>Joining the game</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button class="btn btn-outline-info" type="submit">Join!</button>
+        </form>
+    </div>
+{% endblock content %}

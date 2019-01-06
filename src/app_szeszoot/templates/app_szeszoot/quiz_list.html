@@ -1,0 +1,19 @@
+{% extends 'app_szeszoot/base.html' %}
+
+{% block content %}
+
+    <h4>Available Quizzes</h4>
+    <ul>
+        {% for quiz in quiz_list %}
+            <li>
+                <strong>
+                    <a href="{% url 'quiz-panel' quiz.pk %}">{{ quiz.title }}</a>
+                </strong>
+                <span>
+                    {{ quiz.description }}
+                </span>
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock content %}

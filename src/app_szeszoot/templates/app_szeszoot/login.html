@@ -1,0 +1,15 @@
+{% extends 'app_szeszoot/base.html' %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+    <div>
+        <h4>Log in:</h4>
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button class="btn btn-outline-info" type="submit">Log in</button>
+        </form>
+    </div>
+{% endblock content %}
+
+

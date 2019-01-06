@@ -1,0 +1,15 @@
+{% extends 'app_szeszoot/base.html' %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+    <div>
+        <h3>Adding new Quiz</h3>
+        <h4>Create question:</h4>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button class="btn btn-outline-info" type="submit">Save and add next question!</button>
+            <a class="btn btn-outline-danger" href="{% url 'home' %}">Discard current inputs and Finish!</a>
+        </form>
+    </div>
+{% endblock content %}
