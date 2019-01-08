@@ -1,0 +1,48 @@
+{% extends 'app_szeszoot/base.html' %}
+
+
+{% block content %}
+    <h4>Game id {{ game.pk }}</h4>
+    <div>
+        <h4>Players:</h4>
+        <div id="div-players">
+
+        </div>
+    </div>
+    <button type="button" class="btn btn-outline-info">Start!</button>
+    <script>
+        // script for game master
+        //$.ready(function() {
+            let divPlayers = $('#div-players');
+            let quizId = {{ quiz.id }};
+            let gameId = {{ game.id }};
+            let button = document.querySelector('.btn');
+
+            let socket = new WebSocket(
+                `ws://${window.location.host}/ws/game_master_panel/${quizId}/${gameId}/`
+            );
+
+            socket.onopen = function() {
+                console.log('WebSockets connection created.')
+            };
+
+            socket.onmessage = function(e) {
+                console.log('message incame');
+                let data = JSON.parse(e.data);
+                let message = data['message'];
+                divPlayers.after(`<p>${message}</p>`)
+            };
+
+            socket.onclose = function (e) {
+                console.error('Socket closed unexpectedly.')
+            };
+
+            button.onclick = function(e) {
+                socket.send(JSON.stringify({
+                    'message': 'kliknieto start'
+                }))
+            };
+        //});
+
+    </script>
+{% endblock content %}
