@@ -10,6 +10,7 @@ from django.views.generic import (
     FormView,
     ListView,
     DetailView,
+    View,
 )
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
@@ -92,13 +93,23 @@ class QuizListView(ListView):
     template_name = 'app_szeszoot/quiz_list.html'
 
 
-class QuizPanelView(DetailView):
+class GameCreateView(View):
+    def get(self, *args, **kwargs):
+        game = Game.objects.create()
+        return redirect(reverse_lazy('game-master-panel', kwargs={
+            'game_pk': game.id,
+            'quiz_pk': self.kwargs['quiz_pk'],
+        }))
+
+
+class GameMasterPanelView(DetailView):
     model         = Quiz
-    template_name = 'app_szeszoot/quiz_panel.html'
+    template_name = 'app_szeszoot/game_master_panel.html'
+    pk_url_kwarg  = 'quiz_pk'
 
     def get_context_data(self, **kwargs):
         ctx         = super().get_context_data(**kwargs)
-        ctx['game'] = Game.objects.create()
+        ctx['game'] = Game.objects.get(pk=self.kwargs.get('game_pk'))
         return ctx
 
 

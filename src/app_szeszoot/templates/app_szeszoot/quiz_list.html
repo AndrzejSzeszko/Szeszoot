@@ -7,7 +7,7 @@
         {% for quiz in quiz_list %}
             <li>
                 <strong>
-                    <a href="{% url 'quiz-panel' quiz.pk %}">{{ quiz.title }}</a>
+                    <a href="{% url 'game-create' quiz.pk %}">{{ quiz.title }}</a>
                 </strong>
                 <span>
                     {{ quiz.description }}
