@@ -13,11 +13,17 @@ class Quiz(models.Model):
     title       = models.CharField(max_length=32, unique=True)
     description = models.CharField(max_length=256)
 
+    def __str__(self):
+        return self.title
+
 
 class Question(models.Model):
     question_content = models.CharField(max_length=256)
     image            = models.ImageField(upload_to='questions_images', null=True, blank=True)
     quiz             = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.question_content
 
 
 class Answer(models.Model):
@@ -25,6 +31,9 @@ class Answer(models.Model):
     answer_content = models.CharField(max_length=256)
     is_correct     = models.BooleanField(default=False)
     player         = models.ManyToManyField('Player')
+
+    def __str__(self):
+        return self.answer_content
 
 
 class Game(models.Model):
@@ -35,3 +44,6 @@ class Player(models.Model):
     nickname = models.CharField(max_length=32, unique=True)
     game     = models.ForeignKey(Game, on_delete=models.CASCADE)
     user     = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.nickname
