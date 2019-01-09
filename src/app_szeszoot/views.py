@@ -31,6 +31,12 @@ from .models import (
     Game,
     Player,
 )
+from .serializers import (
+    AnswerSerializer,
+    QuestionSerializer,
+    QuizSerializer,
+)
+from random import shuffle
 
 
 def index(request):
@@ -110,6 +116,12 @@ class GameMasterPanelView(DetailView):
     def get_context_data(self, **kwargs):
         ctx         = super().get_context_data(**kwargs)
         ctx['game'] = Game.objects.get(pk=self.kwargs.get('game_pk'))
+        quiz_dict = QuizSerializer(self.object).data
+
+        for question in quiz_dict['question_set']:
+            shuffle(question['answer_set'])
+
+        ctx['quiz_dict'] = quiz_dict
         return ctx
 
 
@@ -119,9 +131,11 @@ class PlayerCreateView(CreateView):
     template_name = 'app_szeszoot/player_create.html'
 
     def get_success_url(self):
-        return reverse_lazy('game', kwargs={'pk': self.request.POST['game']})
+        return reverse_lazy('player-panel', kwargs={
+            'game_pk': self.object.game.id,
+        })
 
 
-class GameView(DetailView):
-    model = Game
-    template_name = 'app_szeszoot/game.html'
+class PlayerPanelView(DetailView):
+    model = Player
+    template_name = 'app_szeszoot/player_panel.html'
