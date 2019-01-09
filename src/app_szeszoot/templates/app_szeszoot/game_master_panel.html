@@ -2,46 +2,189 @@
 
 
 {% block content %}
-    <h4>Game id {{ game.pk }}</h4>
-    <div>
-        <h4>Players:</h4>
-        <div id="div-players">
+    <div class="container">
+        <div class="row">
+            <div id="left" class="col-6">
+                <h4>Game id {{ game.pk }}</h4>
+                <div>
+                    <h4>Players:</h4>
+                    <div id="div-players">
 
+                    </div>
+                </div>
+                <button type="button" id="button" class="btn btn-outline-info">Start!</button>
+            </div>
+            <div id="right" class="col-6">
+                <p id="quiz-title" class="col-12 text-center">{{ quiz.title }}</p>
+                <p id="question-counter" class="col-12 text-center"></p>
+                <h4 id="question" class="col-12 text-center invisible">
+                    Question
+                </h4>
+                <div class="container">
+                    <div class="row">
+                        <div id="danger" class="col-6 btn btn-danger answer invisible">
+                            <br>
+                            <br>
+                            <p class="wrap"></p>
+                            <br>
+                        </div>
+                        <div id="info" class="col-6 btn btn-info answer invisible">
+                            <br>
+                            <br>
+                            <p class="wrap"></p>
+                            <br>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="primary" class="col-6 btn btn-primary answer invisible">
+                            <br>
+                            <br>
+                            <p class="wrap"></p>
+                            <br>
+                        </div>
+                        <div id="warning" class="col-6 btn btn-warning answer invisible">
+                            <br>
+                            <br>
+                            <p class="wrap"></p>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+                <p id="timer" class="invisible">10</p>
+            </div>
         </div>
     </div>
-    <button type="button" class="btn btn-outline-info">Start!</button>
+
+    {{ quiz_dict|json_script:'quizJson' }}
     <script>
         // script for game master
         //$.ready(function() {
             let divPlayers = $('#div-players');
             let quizId = {{ quiz.id }};
             let gameId = {{ game.id }};
-            let button = document.querySelector('.btn');
+            let quizJson = JSON.parse($('#quizJson').text());
+            let button = $('#button');
+            let questionCount = quizJson['question_set'].length;
+            let questionCounter = $('#question-counter');
+            let answers = $('.answer');
+            let question = $('#question');
+            let timer = $('#timer');
+            let currentQuestionIndex = -1;
+            let currentCorrectAnswer = null;
+
+
+            questionCounter.text(`${currentQuestionIndex + 1}/${questionCount}`);
+
+
+            console.log(typeof(quizJson), quizJson);
+
 
             let socket = new WebSocket(
                 `ws://${window.location.host}/ws/game_master_panel/${quizId}/${gameId}/`
             );
 
+
             socket.onopen = function() {
                 console.log('WebSockets connection created.')
             };
+
 
             socket.onmessage = function(e) {
                 console.log('message incame');
                 let data = JSON.parse(e.data);
                 let message = data['message'];
-                divPlayers.after(`<p>${message}</p>`)
+                let nickname = JSON.parse(message)['nickname'];
+                divPlayers.after(`<p id="${nickname}" class="p-player">${nickname}</p>`)
             };
 
-            socket.onclose = function (e) {
+
+            socket.onclose = function () {
                 console.error('Socket closed unexpectedly.')
             };
 
-            button.onclick = function(e) {
-                socket.send(JSON.stringify({
-                    'message': 'kliknieto start'
-                }))
+
+
+            let playerSocket = new WebSocket(
+                `ws://${window.location.host}/ws/player_panel/${gameId}/`
+            );
+
+
+            playerSocket.onopen = function() {
+                console.log('WebSockets connection created.')
             };
+
+
+            playerSocket.onmessage = function(e) {
+                console.log('message incame');
+                let data = JSON.parse(e.data);
+                let message = data['message'];
+                let nickname = JSON.parse(message)['nickname'];
+                divPlayers.after(`<p id="${nickname}" class="p-player">${nickname}</p>`)
+            };
+
+
+            playerSocket.onclose = function () {
+                console.error('Socket closed unexpectedly.')
+            };
+
+
+
+            button.click(function () {
+                currentQuestionIndex += 1;
+                questionCounter.text(`${currentQuestionIndex + 1}/${questionCount}`);
+
+                question
+                    .removeClass('invisible')
+                    .text(quizJson['question_set'][currentQuestionIndex]['question_content']);
+
+                answers.each(function (index, element) {
+                    let elemId = $(this).attr('id');
+                    console.log(elemId);
+
+                    $(this)
+                        .removeClass()
+                        .addClass(`col-6 btn btn-${elemId} answer`)
+                        .find('p')
+                        .text(quizJson['question_set'][currentQuestionIndex]['answer_set'][index]['answer_content']);
+
+                    if (quizJson['question_set'][currentQuestionIndex]['answer_set'][index]['is_correct']) {
+                        currentCorrectAnswer = $(this).text();
+                        console.log('correct', currentCorrectAnswer);
+                    }
+                });
+
+                timer.removeClass('invisible');
+
+                let duration = 9;
+                let clock = setInterval(displaySeconds, 1000);
+                function displaySeconds() {
+                    timer.text(duration);
+                    duration -= 1;
+                    if (duration < 0) {
+                        end_of_time()
+                    }
+                }
+
+                function end_of_time() {
+                    clearInterval(clock);
+                    button.prop('disabled', false);
+                    answers.each(function (index, element) {
+                        $(this)
+                            .removeClass()
+                            .addClass("col-6 btn answer")
+                            .addClass($(this).text() === currentCorrectAnswer ? 'btn-success' : 'btn-default');
+                    });
+                }
+
+                $(this)
+                    .text(currentQuestionIndex + 1 === questionCount ? 'Finish!' : 'Next question!')
+                    .prop('disabled', true);
+
+                socket.send(JSON.stringify({
+                    'message': 'ee'
+                }))
+
+            })
         //});
 
     </script>
