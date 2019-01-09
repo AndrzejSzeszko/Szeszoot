@@ -1,0 +1,83 @@
+{% extends 'app_szeszoot/base.html' %}
+
+
+{% block content %}
+    <h4>{{ player.nickname }}, you are playing game of id: {{ player.game.pk }}</h4>
+    <p id="question-counter"></p>
+    <div class="container">
+        <div class="row">
+            <div id="danger" class="col-4 btn btn-danger disabled">
+                <br>
+                <br>
+                <p class="wrap"></p>
+                <br>
+            </div>
+            <div id="info" class="col-4 btn btn-info disabled">
+                <br>
+                <br>
+                <p class="wrap"></p>
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div id="primary" class="col-4 btn btn-primary disabled">
+                <br>
+                <br>
+                <p class="wrap"></p>
+                <br>
+            </div>
+            <div id="warning" class="col-4 btn btn-warning disabled">
+                <br>
+                <br>
+                <p class="wrap"></p>
+                <br>
+            </div>
+        </div>
+    </div>
+    <script>
+        // script for players
+        let gameId = {{ player.game.id }};
+        let header = $('h4');
+        let questionCounter = $('#question-counter');
+        let buttons = $('.btn');
+        console.log(header);
+
+        let socket = new WebSocket(
+            `ws://${window.location.host}/ws/player_panel/${gameId}/`
+        );
+
+        socket.onopen = function () {
+            console.log('Socket connection created')
+        };
+
+        socket.onmessage = function (e) {
+            console.log('Message income');
+            let data = JSON.parse(e.data);
+            let message = data['message'];
+            let question_no = data['question_no'];
+
+            questionCounter.text(`Question ${data['question_no']}/${data['questions_total']}:`);
+            buttons.each(function (index, element) {
+                element
+                    .find('p')
+                    .text(`${data['answers'][index]}`);
+
+                element.prop('disabled', false)
+
+
+            })
+        };
+
+        socket.onclose = function () {
+            console.error('Socket closed unexpectedly.')
+        };
+
+        buttons.click(function () {
+
+            socket.send(JSON.stringify({
+                'message': 'ee'
+            }))
+        });
+
+    </script>
+{% endblock content %}
