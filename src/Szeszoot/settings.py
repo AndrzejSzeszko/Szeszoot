@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'channels',
     'crispy_forms',
     'betterforms',
+    'rest_framework',
     # django defaults
     'django.contrib.admin',
     'django.contrib.auth',
@@ -171,4 +172,13 @@ CHANNEL_LAYERS = {
             'hosts': [('127.0.0.1', 6379)]
         }
     }
+}
+
+
+# Django REST
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
 }
