@@ -13,9 +13,9 @@ urlpatterns = [
     path('question_create/<str:quiz_title>/', views.QuestionCreateView.as_view(), name='question-create'),
     path('set_up_game/quiz_list/', views.QuizListView.as_view(), name='quiz-list'),
     path('game_create/<int:quiz_pk>/', views.GameCreateView.as_view(), name='game-create'),
-    path('game_master_panel/<int:quiz_pk>/<int:game_pk>/', views.GameMasterPanelView.as_view(), name='game-master-panel'),
+    path('game_master_panel/<int:game_pk>/', views.GameMasterPanelView.as_view(), name='game-master-panel'),
     path('player_create/', views.PlayerCreateView.as_view(), name='player-create'),
-    path('player_panel/<int:game_pk>/', views.PlayerPanelView.as_view(), name='player-panel'),
+    path('player_panel/<int:pk>/', views.PlayerPanelView.as_view(), name='player-panel'),
     path('', views.index, name='index'),
     path('<str:room_name>/', views.room, name='room'),
 ]
