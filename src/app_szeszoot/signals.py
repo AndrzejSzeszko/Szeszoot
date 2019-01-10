@@ -11,7 +11,7 @@ import json
 def display_joined_player(sender, instance, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
-        message = json.dumps({'nickname': instance.nickname})
+        message = {'from_player_joined_signal': {'nickname': instance.nickname}}
         async_to_sync(channel_layer.group_send)(
             f'master_game_{instance.game.pk}',
             {

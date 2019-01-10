@@ -13,7 +13,6 @@ from .models import (
     Player,
 )
 
-
 class SignInForm(UserCreationForm):
     email = forms.EmailField()
 
