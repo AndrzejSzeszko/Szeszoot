@@ -15,39 +15,39 @@
                 <button type="button" id="button" class="btn btn-outline-info">Start!</button>
             </div>
             <div id="right" class="col-6">
-                <p id="quiz-title" class="col-12 text-center">{{ quiz.title }}</p>
+                <p id="quiz-title" class="col-12 text-center">{{ game.quiz.title }}</p>
                 <p id="question-counter" class="col-12 text-center"></p>
                 <h4 id="question" class="col-12 text-center invisible">
                     Question
                 </h4>
                 <div class="container">
                     <div class="row">
-                        <div id="danger" class="col-6 btn btn-danger answer invisible">
+                        <button id="danger" class="col-6 btn btn-danger answer invisible">
                             <br>
                             <br>
                             <p class="wrap"></p>
                             <br>
-                        </div>
-                        <div id="info" class="col-6 btn btn-info answer invisible">
+                        </button>
+                        <button id="info" class="col-6 btn btn-info answer invisible">
                             <br>
                             <br>
                             <p class="wrap"></p>
                             <br>
-                        </div>
+                        </button>
                     </div>
                     <div class="row">
-                        <div id="primary" class="col-6 btn btn-primary answer invisible">
+                        <button id="primary" class="col-6 btn btn-primary answer invisible">
                             <br>
                             <br>
                             <p class="wrap"></p>
                             <br>
-                        </div>
-                        <div id="warning" class="col-6 btn btn-warning answer invisible">
+                        </button>
+                        <button id="warning" class="col-6 btn btn-warning answer invisible">
                             <br>
                             <br>
                             <p class="wrap"></p>
                             <br>
-                        </div>
+                        </button>
                     </div>
                 </div>
                 <p id="timer" class="invisible">10</p>
@@ -60,7 +60,7 @@
         // script for game master
         //$.ready(function() {
             let divPlayers = $('#div-players');
-            let quizId = {{ quiz.id }};
+            let quizId = {{ game.quiz.id }};
             let gameId = {{ game.id }};
             let quizJson = JSON.parse($('#quizJson').text());
             let button = $('#button');
@@ -71,6 +71,7 @@
             let timer = $('#timer');
             let currentQuestionIndex = -1;
             let currentCorrectAnswer = null;
+            let players = {};
 
 
             questionCounter.text(`${currentQuestionIndex + 1}/${questionCount}`);
@@ -80,7 +81,7 @@
 
 
             let socket = new WebSocket(
-                `ws://${window.location.host}/ws/game_master_panel/${quizId}/${gameId}/`
+                `ws://${window.location.host}/ws/game/${gameId}/`
             );
 
 
@@ -92,9 +93,25 @@
             socket.onmessage = function(e) {
                 console.log('message incame');
                 let data = JSON.parse(e.data);
+                console.log('data', data);
                 let message = data['message'];
-                let nickname = JSON.parse(message)['nickname'];
-                divPlayers.after(`<p id="${nickname}" class="p-player">${nickname}</p>`)
+                if (message['from_player_joined_signal']) {
+                    let nickname = message['from_player_joined_signal']['nickname'];
+                    players[`${nickname}`] = new Array(questionCount).fill(null);
+                    console.log('players', players);
+                    divPlayers.after(`
+                            <p id="${nickname}" class="p-player">
+                                <span id="nickname">${nickname}</span>
+                                <span id="base-points">0</span>
+                                <span id="gained-points">+0</span>
+                                <span id="total-points">0</span>
+                            </p>
+                    `)
+                } else if (message['from_player']) {
+                    let nickname = message['from_player']['nickname'];
+                    players[nickname][`${currentQuestionIndex}`] = 1 * (message['from_player']['is_correct']);
+                    $(`#${nickname}`).css('font-weight', 'Bold')
+                }
             };
 
 
@@ -103,35 +120,11 @@
             };
 
 
-
-            let playerSocket = new WebSocket(
-                `ws://${window.location.host}/ws/player_panel/${gameId}/`
-            );
-
-
-            playerSocket.onopen = function() {
-                console.log('WebSockets connection created.')
-            };
-
-
-            playerSocket.onmessage = function(e) {
-                console.log('message incame');
-                let data = JSON.parse(e.data);
-                let message = data['message'];
-                let nickname = JSON.parse(message)['nickname'];
-                divPlayers.after(`<p id="${nickname}" class="p-player">${nickname}</p>`)
-            };
-
-
-            playerSocket.onclose = function () {
-                console.error('Socket closed unexpectedly.')
-            };
-
-
-
             button.click(function () {
                 currentQuestionIndex += 1;
                 questionCounter.text(`${currentQuestionIndex + 1}/${questionCount}`);
+
+                $('.p-player').removeAttr('style');
 
                 question
                     .removeClass('invisible')
@@ -161,18 +154,17 @@
                     timer.text(duration);
                     duration -= 1;
                     if (duration < 0) {
-                        end_of_time()
+                        endOfTimeOrAllPlayersAnswered()
                     }
                 }
 
-                function end_of_time() {
+                function endOfTimeOrAllPlayersAnswered() {
                     clearInterval(clock);
                     button.prop('disabled', false);
                     answers.each(function (index, element) {
                         $(this)
                             .removeClass()
-                            .addClass("col-6 btn answer")
-                            .addClass($(this).text() === currentCorrectAnswer ? 'btn-success' : 'btn-default');
+                            .addClass($(this).text() === currentCorrectAnswer ? 'btn btn-success col-6 answer' : 'btn col-6 answer');
                     });
                 }
 
@@ -180,8 +172,14 @@
                     .text(currentQuestionIndex + 1 === questionCount ? 'Finish!' : 'Next question!')
                     .prop('disabled', true);
 
+                let messageToPlayers = {
+                    'from_master': {
+                        'questionCount': [currentQuestionIndex, questionCount],
+                        'answers': quizJson['question_set'][currentQuestionIndex]['answer_set']
+                    }
+                };
                 socket.send(JSON.stringify({
-                    'message': 'ee'
+                    'message': messageToPlayers
                 }))
 
             })
