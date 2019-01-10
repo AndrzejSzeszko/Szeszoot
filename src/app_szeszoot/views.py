@@ -101,22 +101,22 @@ class QuizListView(ListView):
 
 class GameCreateView(View):
     def get(self, *args, **kwargs):
-        game = Game.objects.create()
+        game = Game.objects.create(quiz=Quiz.objects.get(pk=self.kwargs['quiz_pk']))
         return redirect(reverse_lazy('game-master-panel', kwargs={
-            'game_pk': game.id,
-            'quiz_pk': self.kwargs['quiz_pk'],
+            'game_pk': game.pk,
+            # 'quiz_pk': self.kwargs['quiz_pk'],
         }))
 
 
 class GameMasterPanelView(DetailView):
-    model         = Quiz
+    model         = Game
     template_name = 'app_szeszoot/game_master_panel.html'
-    pk_url_kwarg  = 'quiz_pk'
+    pk_url_kwarg  = 'game_pk'
 
     def get_context_data(self, **kwargs):
         ctx         = super().get_context_data(**kwargs)
-        ctx['game'] = Game.objects.get(pk=self.kwargs.get('game_pk'))
-        quiz_dict = QuizSerializer(self.object).data
+        # ctx[''] = Game.objects.get(pk=self.kwargs.get('game_pk'))
+        quiz_dict = QuizSerializer(self.object.quiz).data
 
         for question in quiz_dict['question_set']:
             shuffle(question['answer_set'])
@@ -132,7 +132,7 @@ class PlayerCreateView(CreateView):
 
     def get_success_url(self):
         return reverse_lazy('player-panel', kwargs={
-            'game_pk': self.object.game.id,
+            'pk': self.object.id,
         })
 
 
