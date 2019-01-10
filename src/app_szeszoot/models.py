@@ -37,7 +37,8 @@ class Answer(models.Model):
 
 
 class Game(models.Model):
-    PIN = models.PositiveIntegerField(null=True)
+    PIN  = models.PositiveIntegerField(null=True)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
 
 
 class Player(models.Model):
