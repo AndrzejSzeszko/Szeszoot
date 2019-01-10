@@ -6,76 +6,104 @@
     <p id="question-counter"></p>
     <div class="container">
         <div class="row">
-            <div id="danger" class="col-4 btn btn-danger disabled">
+            <button id="danger" class="btn btn-danger col-4">
                 <br>
                 <br>
                 <p class="wrap"></p>
                 <br>
-            </div>
-            <div id="info" class="col-4 btn btn-info disabled">
+            </button>
+            <button id="info" class="btn btn-info col-4">
                 <br>
                 <br>
                 <p class="wrap"></p>
                 <br>
-            </div>
+            </button>
         </div>
         <div class="row">
-            <div id="primary" class="col-4 btn btn-primary disabled">
+            <button id="primary" class="btn btn-primary col-4">
                 <br>
                 <br>
                 <p class="wrap"></p>
                 <br>
-            </div>
-            <div id="warning" class="col-4 btn btn-warning disabled">
+            </button>
+            <button id="warning" class="btn btn-warning col-4">
                 <br>
                 <br>
                 <p class="wrap"></p>
                 <br>
-            </div>
+            </button>
         </div>
     </div>
     <script>
         // script for players
+        let nickname = '{{ player.nickname|safe }}';
         let gameId = {{ player.game.id }};
         let header = $('h4');
         let questionCounter = $('#question-counter');
         let buttons = $('.btn');
-        console.log(header);
+
+        buttons.prop('disabled', true);
+
 
         let socket = new WebSocket(
-            `ws://${window.location.host}/ws/player_panel/${gameId}/`
+            `ws://${window.location.host}/ws/game/${gameId}/`
         );
+
 
         socket.onopen = function () {
             console.log('Socket connection created')
         };
 
+
         socket.onmessage = function (e) {
             console.log('Message income');
             let data = JSON.parse(e.data);
             let message = data['message'];
-            let question_no = data['question_no'];
+            console.log(message);
+            if (message['from_master']) {
+                let questionCounterData = message['from_master']['questionCount'];
+                questionCounter.text(`Question ${questionCounterData[0] + 1}/${questionCounterData[1]}:`);
 
-            questionCounter.text(`Question ${data['question_no']}/${data['questions_total']}:`);
-            buttons.each(function (index, element) {
-                element
-                    .find('p')
-                    .text(`${data['answers'][index]}`);
-
-                element.prop('disabled', false)
-
-
-            })
+                buttons.each(function (index, element) {
+                    let elemId = $(this).attr('id');
+                    $(this)
+                        .removeClass()
+                        .addClass(`col-4 btn btn-${elemId}`)
+                        .removeAttr('style')
+                        .prop('disabled', false)
+                        .attr('is_correct', message['from_master']['answers'][index]['is_correct'])
+                        .find('p')
+                        .text(message['from_master']['answers'][index]['answer_content']);
+                });
+            }
         };
+
 
         socket.onclose = function () {
             console.error('Socket closed unexpectedly.')
         };
 
-        buttons.click(function () {
 
+        buttons.click(function () {
+            buttons
+                .prop('disabled', true)
+                .removeClass()
+                .addClass('btn col-4');
+            $(this)
+                .removeClass()
+                .addClass('btn col-4')
+                .css('background-color', 'black');
+
+            let messageToSend = {
+                'from_player': {
+                    'nickname': nickname,
+                    //'question_no': message['from_master']['questionCount'][0],
+                    'is_correct': JSON.parse($(this).attr('is_correct')),
+                    //'has_answered': `${}`,
+                }
+            };
             socket.send(JSON.stringify({
-                'message': 'ee'
+                'message': messageToSend
             }))
         });
 
