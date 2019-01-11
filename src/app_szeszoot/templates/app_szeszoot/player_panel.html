@@ -36,6 +36,7 @@
     </div>
     <script>
         // script for players
+        let pathnameToChangeToAfterFinishedGame = '{% url 'home' %}';
         let nickname = '{{ player.nickname|safe }}';
         let gameId = {{ player.game.id }};
         let header = $('h4');
@@ -63,10 +64,14 @@
             if (message['from_master']) {
                 if (message['from_master']['endOfTime']) {
                     greyOutButtons(buttons)
+                } else if (message['from_master']['arrayOfWinners']) {
+                    displayRank(message);
+                    window.location.pathname = pathnameToChangeToAfterFinishedGame
                 } else {
                     displayQuestionCounter(message);
                     activateButtons(buttons, message)
                 }
+
             }
         };
 
@@ -136,6 +141,13 @@
                     .find('p')
                     .text(message['from_master']['answers'][index]['answer_content']);
             });
+        }
+
+
+
+        function displayRank(message) {
+            let rank = message['from_master']['arrayOfWinners'].indexOf(`${nickname}`);
+            alert(`Congratulations! You ranked number ${rank + 1}!`);
         }
 
     </script>
