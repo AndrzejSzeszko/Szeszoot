@@ -109,17 +109,10 @@
             currentQuestionIndex += 1;
 
             if ($(this).text() === 'Finish!') {
-                // sendFinishGameMessageToPlayers
-
-                let playersTotalPoints = [];
-                players.each(function (key, value) {
-                    playersTotalPoints.push({key: value.reduce(sumElemInArray)});
-                });
-                playersTotalPoints.sort(function (a, b) {
-                    return a.val() - b.val()
-                });
-
-                alert(playersTotalPoints);
+                let playersTotalPointsArrayOfArrays = getPlayersTotalPointsArrayOfArrays(players);
+                let alertResultString = getAlertResultsString(playersTotalPointsArrayOfArrays);
+                sendArrayOfWinnersToPlayers(playersTotalPointsArrayOfArrays);
+                alert(alertResultString);
                 window.location.pathname = pathnameToChangeToAfterFinishedGame
             }
             displayQuestionCounter();
@@ -300,6 +293,51 @@
         function sumElemInArray (total, currentValue) {
             return total + currentValue
         }
+
+
+
+        function getPlayersTotalPointsArrayOfArrays(players) {
+            let playersTotalPoints = Object.keys(players).map(function (key) {
+                return [key, players[key].reduce(sumElemInArray)]
+            });
+
+            playersTotalPoints.sort(function (a, b) {
+                return b[1] - a[1]
+            });
+
+            return playersTotalPoints
+        }
+
+
+
+        function sendArrayOfWinnersToPlayers(resultsArrayOfArrays) {
+            let arrayOfWinners = [];
+            for (let arr of resultsArrayOfArrays) {
+                arrayOfWinners.push(arr[0])
+            }
+
+            let messageToPlayers = {
+                'from_master': {
+                    'questionCount': [currentQuestionIndex, questionCount],
+                    'arrayOfWinners': arrayOfWinners,
+                }
+            };
+            socket.send(JSON.stringify({
+                'message': messageToPlayers
+            }))
+        }
+
+
+
+        function getAlertResultsString(playersTotalPoints) {
+            let alertResultsStr = '';
+            for (let player of playersTotalPoints) {
+                alertResultsStr += `${player[0]}: ${player[1]}\n`
+            }
+            return alertResultsStr
+        }
+
+
 
     </script>
 {% endblock content %}
