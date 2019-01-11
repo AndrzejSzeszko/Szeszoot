@@ -61,20 +61,12 @@
             let message = data['message'];
             console.log(message);
             if (message['from_master']) {
-                let questionCounterData = message['from_master']['questionCount'];
-                questionCounter.text(`Question ${questionCounterData[0] + 1}/${questionCounterData[1]}:`);
-
-                buttons.each(function (index, element) {
-                    let elemId = $(this).attr('id');
-                    $(this)
-                        .removeClass()
-                        .addClass(`col-4 btn btn-${elemId}`)
-                        .removeAttr('style')
-                        .prop('disabled', false)
-                        .attr('is_correct', message['from_master']['answers'][index]['is_correct'])
-                        .find('p')
-                        .text(message['from_master']['answers'][index]['answer_content']);
-                });
+                if (message['from_master']['endOfTime']) {
+                    greyOutButtons(buttons)
+                } else {
+                    displayQuestionCounter(message);
+                    activateButtons(buttons, message)
+                }
             }
         };
 
@@ -85,27 +77,66 @@
 
 
         buttons.click(function () {
+            greyOutButtons(buttons);
+            blackOutButton($(this));
+            sendMessageToGameMaster($(this));
+        });
+
+
+
+        function displayQuestionCounter(message) {
+            let questionCounterData = message['from_master']['questionCount'];
+            questionCounter.text(`Question ${questionCounterData[0] + 1}/${questionCounterData[1]}:`);
+        }
+
+
+
+        function greyOutButtons(buttons) {
             buttons
                 .prop('disabled', true)
                 .removeClass()
                 .addClass('btn col-4');
-            $(this)
+        }
+
+
+        function blackOutButton(button) {
+            button
                 .removeClass()
                 .addClass('btn col-4')
                 .css('background-color', 'black');
+        }
 
+
+
+        function sendMessageToGameMaster(button) {
             let messageToSend = {
                 'from_player': {
                     'nickname': nickname,
                     //'question_no': message['from_master']['questionCount'][0],
-                    'is_correct': JSON.parse($(this).attr('is_correct')),
+                    'is_correct': JSON.parse((button).attr('is_correct')),
                     //'has_answered': `${}`,
                 }
             };
             socket.send(JSON.stringify({
                 'message': messageToSend
             }))
-        });
+        }
+
+
+
+        function activateButtons(buttons, message) {
+            buttons.each(function (index, element) {
+                let elemId = $(this).attr('id');
+                $(this)
+                    .removeClass()
+                    .addClass(`col-4 btn btn-${elemId}`)
+                    .removeAttr('style')
+                    .prop('disabled', false)
+                    .attr('is_correct', message['from_master']['answers'][index]['is_correct'])
+                    .find('p')
+                    .text(message['from_master']['answers'][index]['answer_content']);
+            });
+        }
 
     </script>
 {% endblock content %}
