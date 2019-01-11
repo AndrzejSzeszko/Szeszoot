@@ -30,7 +30,7 @@ class Answer(models.Model):
     question       = models.ForeignKey(Question, on_delete=models.CASCADE)
     answer_content = models.CharField(max_length=256)
     is_correct     = models.BooleanField(default=False)
-    player         = models.ManyToManyField('Player')
+    player         = models.ManyToManyField('Player', through='PlayerAnswer')
 
     def __str__(self):
         return self.answer_content
@@ -48,3 +48,9 @@ class Player(models.Model):
 
     def __str__(self):
         return self.nickname
+
+
+class PlayerAnswer(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+    points = models.FloatField()
