@@ -50,140 +50,256 @@
                         </button>
                     </div>
                 </div>
-                <p id="timer" class="invisible">10</p>
+                <p id="timer" class="invisible"></p>
             </div>
         </div>
     </div>
 
     {{ quiz_dict|json_script:'quizJson' }}
     <script>
-        // script for game master
-        //$.ready(function() {
-            let divPlayers = $('#div-players');
-            let quizId = {{ game.quiz.id }};
-            let gameId = {{ game.id }};
-            let quizJson = JSON.parse($('#quizJson').text());
-            let button = $('#button');
-            let questionCount = quizJson['question_set'].length;
-            let questionCounter = $('#question-counter');
-            let answers = $('.answer');
-            let question = $('#question');
-            let timer = $('#timer');
-            let currentQuestionIndex = -1;
-            let currentCorrectAnswer = null;
-            let players = {};
+        let pathnameToChangeToAfterFinishedGame = '{% url 'home' %}';
+        let divPlayers = $('#div-players');
+        let quizId = {{ game.quiz.id }};
+        let gameId = {{ game.id }};
+        let quizJson = JSON.parse($('#quizJson').text());
+        let button = $('#button');
+        let questionCount = quizJson['question_set'].length;
+        let questionCounter = $('#question-counter');
+        let answers = $('.answer');
+        let question = $('#question');
+        let timer = $('#timer');
+        let currentQuestionIndex = -1;
+        let currentCorrectAnswer = null;
+        let players = {};
+        let globalClock;
+        let answerTime = 10;
+        let socket = new WebSocket(
+            `ws://${window.location.host}/ws/game/${gameId}/`
+        );
 
 
-            questionCounter.text(`${currentQuestionIndex + 1}/${questionCount}`);
+        questionCounter.text(`${currentQuestionIndex + 1}/${questionCount}`);
+        console.log(typeof(quizJson), quizJson);
 
 
-            console.log(typeof(quizJson), quizJson);
+        socket.onopen = function() {
+            console.log('WebSockets connection created.')
+        };
 
 
-            let socket = new WebSocket(
-                `ws://${window.location.host}/ws/game/${gameId}/`
-            );
+        socket.onmessage = function(e) {
+            console.log('message incame');
+            let data = JSON.parse(e.data);
+            console.log('data', data);
+            let message = data['message'];
+            if (message['from_player_joined_signal']) {
+                addPlayerToList(message);
+            } else if (message['from_player']) {
+                markPlayerAnswered(message);
+            }
+        };
 
 
-            socket.onopen = function() {
-                console.log('WebSockets connection created.')
-            };
+        socket.onclose = function () {
+            console.error('Socket closed unexpectedly.')
+        };
 
 
-            socket.onmessage = function(e) {
-                console.log('message incame');
-                let data = JSON.parse(e.data);
-                console.log('data', data);
-                let message = data['message'];
-                if (message['from_player_joined_signal']) {
-                    let nickname = message['from_player_joined_signal']['nickname'];
-                    players[`${nickname}`] = new Array(questionCount).fill(null);
-                    console.log('players', players);
-                    divPlayers.after(`
-                            <p id="${nickname}" class="p-player">
-                                <span id="nickname">${nickname}</span>
-                                <span id="base-points">0</span>
-                                <span id="gained-points">+0</span>
-                                <span id="total-points">0</span>
-                            </p>
-                    `)
-                } else if (message['from_player']) {
-                    let nickname = message['from_player']['nickname'];
-                    players[nickname][`${currentQuestionIndex}`] = 1 * (message['from_player']['is_correct']);
-                    $(`#${nickname}`).css('font-weight', 'Bold')
-                }
-            };
+        button.click(function () {
+            currentQuestionIndex += 1;
 
+            if ($(this).text() === 'Finish!') {
+                // sendFinishGameMessageToPlayers
 
-            socket.onclose = function () {
-                console.error('Socket closed unexpectedly.')
-            };
-
-
-            button.click(function () {
-                currentQuestionIndex += 1;
-                questionCounter.text(`${currentQuestionIndex + 1}/${questionCount}`);
-
-                $('.p-player').removeAttr('style');
-
-                question
-                    .removeClass('invisible')
-                    .text(quizJson['question_set'][currentQuestionIndex]['question_content']);
-
-                answers.each(function (index, element) {
-                    let elemId = $(this).attr('id');
-                    console.log(elemId);
-
-                    $(this)
-                        .removeClass()
-                        .addClass(`col-6 btn btn-${elemId} answer`)
-                        .find('p')
-                        .text(quizJson['question_set'][currentQuestionIndex]['answer_set'][index]['answer_content']);
-
-                    if (quizJson['question_set'][currentQuestionIndex]['answer_set'][index]['is_correct']) {
-                        currentCorrectAnswer = $(this).text();
-                        console.log('correct', currentCorrectAnswer);
-                    }
+                let playersTotalPoints = [];
+                players.each(function (key, value) {
+                    playersTotalPoints.push({key: value.reduce(sumElemInArray)});
+                });
+                playersTotalPoints.sort(function (a, b) {
+                    return a.val() - b.val()
                 });
 
-                timer.removeClass('invisible');
+                alert(playersTotalPoints);
+                window.location.pathname = pathnameToChangeToAfterFinishedGame
+            }
+            displayQuestionCounter();
+            markAllPlayersUnanswered();
+            displayQuestion();
+            displayAnswers();
+            displayTimer();
+            startTimer();
+            changeButtonTextToNextQuestionOrFinish($(this));
+            sendAnswersToPlayers();
+        });
 
-                let duration = 9;
-                let clock = setInterval(displaySeconds, 1000);
-                function displaySeconds() {
-                    timer.text(duration);
-                    duration -= 1;
-                    if (duration < 0) {
-                        endOfTimeOrAllPlayersAnswered()
-                    }
-                }
 
-                function endOfTimeOrAllPlayersAnswered() {
-                    clearInterval(clock);
-                    button.prop('disabled', false);
-                    answers.each(function (index, element) {
-                        $(this)
-                            .removeClass()
-                            .addClass($(this).text() === currentCorrectAnswer ? 'btn btn-success col-6 answer' : 'btn col-6 answer');
-                    });
-                }
+
+        function addPlayerToList(message) {
+            let nickname = message['from_player_joined_signal']['nickname'];
+            players[`${nickname}`] = new Array(questionCount).fill(null);
+            console.log('players', players);
+            divPlayers.after(`
+                    <p id="${nickname}" class="p-player">
+                        <span id="nickname">${nickname}</span>
+                        <span id="gained-points"></span>
+                        <span id="total-points"></span>
+                    </p>
+            `)
+        }
+
+
+
+        function markPlayerAnswered(message) {
+            let nickname = message['from_player']['nickname'];
+            players[nickname][`${currentQuestionIndex}`] = 1 * (message['from_player']['is_correct']);
+            $(`#${nickname}`)
+                .css('font-weight', 'Bold')
+                .attr('answered', 'true');
+            let allCurrentPlayers = $('.p-player');
+            let currentPlayersThatAnsweredYet = $('.p-player[answered="true"]');
+            if (allCurrentPlayers.length === currentPlayersThatAnsweredYet.length) {
+                endOfTimeOrAllPlayersAnswered()
+            }
+        }
+
+
+
+        function displayQuestionCounter() {
+            questionCounter.text(`${currentQuestionIndex + 1}/${questionCount}`);
+        }
+
+
+
+        function markAllPlayersUnanswered() {
+            $('.p-player').removeAttr('style answered');
+        }
+
+
+
+        function displayQuestion() {
+            question
+                .removeClass('invisible')
+                .text(quizJson['question_set'][currentQuestionIndex]['question_content']);
+        }
+
+
+
+        function displayAnswers() {
+            answers.each(function (index, element) {
+                let elemId = $(this).attr('id');
+                console.log(elemId);
 
                 $(this)
-                    .text(currentQuestionIndex + 1 === questionCount ? 'Finish!' : 'Next question!')
-                    .prop('disabled', true);
+                    .removeClass()
+                    .addClass(`col-6 btn btn-${elemId} answer`)
+                    .find('p')
+                    .text(quizJson['question_set'][currentQuestionIndex]['answer_set'][index]['answer_content']);
 
-                let messageToPlayers = {
-                    'from_master': {
-                        'questionCount': [currentQuestionIndex, questionCount],
-                        'answers': quizJson['question_set'][currentQuestionIndex]['answer_set']
-                    }
-                };
-                socket.send(JSON.stringify({
-                    'message': messageToPlayers
-                }))
+                if (quizJson['question_set'][currentQuestionIndex]['answer_set'][index]['is_correct']) {
+                    currentCorrectAnswer = $(this).text();
+                    console.log('correct', currentCorrectAnswer);
+                }
+            });
+        }
 
-            })
-        //});
+
+
+        function displayTimer() {
+            timer
+                .removeClass('invisible')
+                .text(answerTime);
+        }
+
+
+
+
+        function startTimer() {
+            let duration = 9;
+            globalClock = setInterval(displaySeconds, 1000);
+            function displaySeconds() {
+                timer.text(duration);
+                duration -= 1;
+                if (duration < 0) {
+                    endOfTimeOrAllPlayersAnswered(true)
+                }
+            }
+        }
+
+
+
+
+        function changeButtonTextToNextQuestionOrFinish(button) {
+            button
+                .text(currentQuestionIndex + 1 === questionCount ? 'Finish!' : 'Next question!')
+                .prop('disabled', true);
+        }
+
+
+
+
+        function sendAnswersToPlayers () {
+            let messageToPlayers = {
+                'from_master': {
+                    'questionCount': [currentQuestionIndex, questionCount],
+                    'answers': quizJson['question_set'][currentQuestionIndex]['answer_set']
+                }
+            };
+            socket.send(JSON.stringify({
+                'message': messageToPlayers
+            }))
+        }
+
+
+
+        function endOfTimeOrAllPlayersAnswered(endOfTime=false) {
+            clearInterval(globalClock);
+            button.prop('disabled', false);
+            answers.each(highlightAnswerIfCorrectAndGreyOutOtherwise);
+            $('.p-player').each(updatePlayerScore);
+            if (endOfTime) {
+                sendEndOfTimeMessageToPlayers()
+            }
+        }
+
+
+
+        function highlightAnswerIfCorrectAndGreyOutOtherwise() {
+            $(this)
+                .removeClass()
+                .addClass($(this).text() === currentCorrectAnswer ? 'btn btn-success col-6 answer' : 'btn col-6 answer');
+        }
+
+
+
+        function updatePlayerScore() {
+            let nickname = $(this).attr('id');
+            $(this)
+                .find('#gained-points')
+                .text(`+${players[nickname][`${currentQuestionIndex}`]}`)
+                .next()
+                .text(`${players[nickname].reduce(sumElemInArray)}`)
+        }
+
+
+
+        function sendEndOfTimeMessageToPlayers() {
+            let messageToPlayers = {
+                'from_master': {
+                    'questionCount': [currentQuestionIndex, questionCount],
+                    {#'answers': quizJson['question_set'][currentQuestionIndex]['answer_set'],#}
+                    'endOfTime': true,
+                }
+            };
+            socket.send(JSON.stringify({
+                'message': messageToPlayers
+            }))
+        }
+
+
+
+        function sumElemInArray (total, currentValue) {
+            return total + currentValue
+        }
 
     </script>
 {% endblock content %}
