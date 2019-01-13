@@ -25,12 +25,20 @@ SECRET_KEY = '51h)3q(jslk*m*+_h3q3$pe2d7mqui4%+3_hi!=(+6mf)=)^x%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '192.168.1.66', '172.17.0.1', '192.168.100.226', '192.168.43.116']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    # custom
+    'app_szeszoot',
+    # third party
+    'channels',
+    'crispy_forms',
+    'betterforms',
+    'rest_framework',
+    # django defaults
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -75,8 +83,11 @@ WSGI_APPLICATION = 'Szeszoot.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'szeszoot',
+        'USER': 'postgres',
+        'PASSWORD': 'coderslab',
+        'HOST': '127.0.0.1',
     }
 }
 
@@ -114,7 +125,60 @@ USE_L10N = True
 USE_TZ = True
 
 
+# Custom user model
+
+AUTH_USER_MODEL = 'app_szeszoot.CustomUser'
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'app_szeszoot/static')
+]
+
+
+# Media (images, etc)
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# Logging in stuff
+
+LOGIN_URL = 'login'
+
+LOGIN_REDIRECT_URL = 'home'
+
+
+# Crispy forms
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+# Channels
+
+ASGI_APPLICATION = 'Szeszoot.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)]
+        }
+    }
+}
+
+
+# Django REST
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}

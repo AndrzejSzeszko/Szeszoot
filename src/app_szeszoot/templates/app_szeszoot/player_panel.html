@@ -1,0 +1,44 @@
+{% extends 'app_szeszoot/base.html' %}
+{% load static %}
+
+
+{% block content %}
+    <h6 class="text-center">{{ player.nickname }}, you are playing game of id: {{ player.game.pk }}</h6>
+    <p id="question-counter" class="text-center"></p>
+    <div class="container">
+        <div class="row">
+            <button id="danger" class="btn btn-danger col-6">
+                <br>
+                <br>
+                <p class="word-wrap"></p>
+                <br>
+            </button>
+            <button id="info" class="btn btn-info col-6">
+                <br>
+                <br>
+                <p class="word-wrap"></p>
+                <br>
+            </button>
+        </div>
+        <div class="row">
+            <button id="primary" class="btn btn-primary col-6">
+                <br>
+                <br>
+                <p class="word-wrap"></p>
+                <br>
+            </button>
+            <button id="warning" class="btn btn-warning col-6">
+                <br>
+                <br>
+                <p class="word-wrap"></p>
+                <br>
+            </button>
+        </div>
+    </div>
+    <script>
+        let nickname = '{{ player.nickname|safe }}';
+        let gameId = {{ player.game.id }};
+        let pathnameToChangeToAfterFinishedGame = '{% url 'home' %}';
+    </script>
+    <script type="text/javascript" src="{% static 'app_szeszoot/js/player_panel.js' %}"></script>
+{% endblock content %}

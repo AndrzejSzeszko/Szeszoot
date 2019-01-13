@@ -1,0 +1,65 @@
+{% extends 'app_szeszoot/base.html' %}
+{% load static %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div id="left" class="col-6">
+                <h4>Game id {{ game.pk }}</h4>
+                <div>
+                    <h5>Players:</h5>
+                    <div id="div-players">
+
+                    </div>
+                </div>
+                <button type="button" id="button" class="btn btn-outline-info">Start!</button>
+            </div>
+            <div id="right" class="col-6">
+                <h4 id="quiz-title" class="col-12 text-center">{{ game.quiz.title }}</h4>
+                <p id="question-counter" class="col-12 text-center"></p>
+                <h4 id="question" class="col-12 text-center invisible">
+
+                </h4>
+                <div class="container">
+                    <div class="row">
+                        <button id="danger" class="col-6 btn btn-danger answer invisible">
+                            <br>
+                            <br>
+                            <p class="word-wrap"></p>
+                            <br>
+                        </button>
+                        <button id="info" class="col-6 btn btn-info answer invisible">
+                            <br>
+                            <br>
+                            <p class="word-wrap"></p>
+                            <br>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <button id="primary" class="col-6 btn btn-primary answer invisible">
+                            <br>
+                            <br>
+                            <p class="word-wrap"></p>
+                            <br>
+                        </button>
+                        <button id="warning" class="col-6 btn btn-warning answer invisible">
+                            <br>
+                            <br>
+                            <p class="word-wrap"></p>
+                            <br>
+                        </button>
+                    </div>
+                </div>
+                <h3 id="timer" class="text-center invisible"></h3>
+            </div>
+        </div>
+    </div>
+
+    {{ quiz_dict|json_script:'quizJson' }}
+    <script>
+        let gameId = {{ game.id }};
+        let pathnameToChangeToAfterFinishedGame = '{% url 'home' %}';
+    </script>
+    <script type="text/javascript" src="{% static 'app_szeszoot/js/master_panel.js' %}"></script>
+{% endblock content %}
