@@ -2,34 +2,34 @@
 
 
 {% block content %}
-    <h4>{{ player.nickname }}, you are playing game of id: {{ player.game.pk }}</h4>
-    <p id="question-counter"></p>
+    <h6 class="text-center">{{ player.nickname }}, you are playing game of id: {{ player.game.pk }}</h6>
+    <p id="question-counter" class="text-center"></p>
     <div class="container">
         <div class="row">
-            <button id="danger" class="btn btn-danger col-4">
+            <button id="danger" class="btn btn-danger col-6">
                 <br>
                 <br>
-                <p class="wrap"></p>
+                <p class="word-wrap"></p>
                 <br>
             </button>
-            <button id="info" class="btn btn-info col-4">
+            <button id="info" class="btn btn-info col-6">
                 <br>
                 <br>
-                <p class="wrap"></p>
+                <p class="word-wrap"></p>
                 <br>
             </button>
         </div>
         <div class="row">
-            <button id="primary" class="btn btn-primary col-4">
+            <button id="primary" class="btn btn-primary col-6">
                 <br>
                 <br>
-                <p class="wrap"></p>
+                <p class="word-wrap"></p>
                 <br>
             </button>
-            <button id="warning" class="btn btn-warning col-4">
+            <button id="warning" class="btn btn-warning col-6">
                 <br>
                 <br>
-                <p class="wrap"></p>
+                <p class="word-wrap"></p>
                 <br>
             </button>
         </div>
@@ -39,9 +39,10 @@
         let pathnameToChangeToAfterFinishedGame = '{% url 'home' %}';
         let nickname = '{{ player.nickname|safe }}';
         let gameId = {{ player.game.id }};
-        let header = $('h4');
         let questionCounter = $('#question-counter');
         let buttons = $('.btn');
+        let startTime;
+        let stopTime;
 
         buttons.prop('disabled', true);
 
@@ -69,7 +70,8 @@
                     window.location.pathname = pathnameToChangeToAfterFinishedGame
                 } else {
                     displayQuestionCounter(message);
-                    activateButtons(buttons, message)
+                    activateButtons(buttons, message);
+                    startTime = Date.now()
                 }
 
             }
@@ -82,6 +84,7 @@
 
 
         buttons.click(function () {
+            stopTime = Date.now();
             greyOutButtons(buttons);
             blackOutButton($(this));
             sendMessageToGameMaster($(this));
@@ -100,14 +103,14 @@
             buttons
                 .prop('disabled', true)
                 .removeClass()
-                .addClass('btn col-4');
+                .addClass('btn col-6');
         }
 
 
         function blackOutButton(button) {
             button
                 .removeClass()
-                .addClass('btn col-4')
+                .addClass('btn col-6')
                 .css('background-color', 'black');
         }
 
@@ -117,9 +120,8 @@
             let messageToSend = {
                 'from_player': {
                     'nickname': nickname,
-                    //'question_no': message['from_master']['questionCount'][0],
                     'is_correct': JSON.parse((button).attr('is_correct')),
-                    //'has_answered': `${}`,
+                    'millisecondsToAnswer':JSON.parse(stopTime - startTime),
                 }
             };
             socket.send(JSON.stringify({
@@ -134,7 +136,7 @@
                 let elemId = $(this).attr('id');
                 $(this)
                     .removeClass()
-                    .addClass(`col-4 btn btn-${elemId}`)
+                    .addClass(`col-6 btn btn-${elemId}`)
                     .removeAttr('style')
                     .prop('disabled', false)
                     .attr('is_correct', message['from_master']['answers'][index]['is_correct'])

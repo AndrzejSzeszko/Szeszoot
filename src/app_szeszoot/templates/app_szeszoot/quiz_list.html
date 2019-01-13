@@ -10,7 +10,9 @@
                     <a href="{% url 'game-create' quiz.pk %}">{{ quiz.title }}</a>
                 </strong>
                 <span>
-                    {{ quiz.description }}
+                    {% if quiz.description %}
+                        {{ quiz.description }}
+                    {% endif %}
                 </span>
             </li>
         {% endfor %}
