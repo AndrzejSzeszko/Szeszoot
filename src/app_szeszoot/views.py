@@ -1,12 +1,9 @@
 from django.shortcuts import (
-    render,
     redirect,
 )
-from django.utils.safestring import mark_safe
 from django.views.generic import (
     TemplateView,
     CreateView,
-    UpdateView,
     FormView,
     ListView,
     DetailView,
@@ -15,38 +12,22 @@ from django.views.generic import (
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.contrib import messages
-import json
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import (
     SignInForm,
     QuizForm,
-    QuestionForm,
-    AnswerForm,
     QuestionAnswerForm,
     PlayerForm,
 )
 from .models import (
     Quiz,
-    Question,
-    Answer,
     Game,
     Player,
 )
 from .serializers import (
-    AnswerSerializer,
-    QuestionSerializer,
     QuizSerializer,
 )
 from random import shuffle
-
-
-def index(request):
-    return render(request, 'app_szeszoot/index.html', {})
-
-
-def room(request, room_name):
-    return render(request, 'app_szeszoot/room.html', {
-        'room_name_json': mark_safe(json.dumps(room_name)),
-    })
 
 
 class HomeView(TemplateView):
@@ -64,15 +45,17 @@ class SignInView(CreateView):
         return super().form_valid(form)
 
 
-class AddQuizView(FormView):
+class AddQuizView(LoginRequiredMixin, FormView):
     template_name = 'app_szeszoot/quiz_add.html'
     form_class    = QuizForm
 
-    def get_success_url(self):
-        return reverse_lazy('question-create', kwargs={'quiz_title': self.request.POST['title']})
+    def get_success_url(self, *args):
+        return reverse_lazy('question-create', kwargs={
+            'quiz_title': self.request.POST['title']
+        })
 
 
-class QuestionCreateView(CreateView):
+class QuestionCreateView(LoginRequiredMixin, CreateView):
     template_name = 'app_szeszoot/question_create.html'
     form_class    = QuestionAnswerForm
     pk_url_kwarg  = 'quiz_title'
@@ -94,28 +77,26 @@ class QuestionCreateView(CreateView):
         return redirect(self.get_success_url())
 
 
-class QuizListView(ListView):
+class QuizListView(LoginRequiredMixin, ListView):
     model         = Quiz
     template_name = 'app_szeszoot/quiz_list.html'
 
 
-class GameCreateView(View):
+class GameCreateView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         game = Game.objects.create(quiz=Quiz.objects.get(pk=self.kwargs['quiz_pk']))
         return redirect(reverse_lazy('game-master-panel', kwargs={
             'game_pk': game.pk,
-            # 'quiz_pk': self.kwargs['quiz_pk'],
         }))
 
 
-class GameMasterPanelView(DetailView):
+class GameMasterPanelView(LoginRequiredMixin, DetailView):
     model         = Game
     template_name = 'app_szeszoot/game_master_panel.html'
     pk_url_kwarg  = 'game_pk'
 
     def get_context_data(self, **kwargs):
         ctx         = super().get_context_data(**kwargs)
-        # ctx[''] = Game.objects.get(pk=self.kwargs.get('game_pk'))
         quiz_dict = QuizSerializer(self.object.quiz).data
 
         for question in quiz_dict['question_set']:
