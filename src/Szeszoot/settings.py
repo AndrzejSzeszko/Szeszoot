@@ -25,7 +25,7 @@ SECRET_KEY = '51h)3q(jslk*m*+_h3q3$pe2d7mqui4%+3_hi!=(+6mf)=)^x%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '192.168.1.66', '172.17.0.1', '192.168.100.226', '192.168.43.116']
 
 
 # Application definition
