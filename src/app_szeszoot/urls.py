@@ -16,6 +16,4 @@ urlpatterns = [
     path('game_master_panel/<int:game_pk>/', views.GameMasterPanelView.as_view(), name='game-master-panel'),
     path('player_create/', views.PlayerCreateView.as_view(), name='player-create'),
     path('player_panel/<int:pk>/', views.PlayerPanelView.as_view(), name='player-panel'),
-    path('', views.index, name='index'),
-    path('<str:room_name>/', views.room, name='room'),
 ]
