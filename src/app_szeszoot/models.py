@@ -11,7 +11,7 @@ class CustomUser(auth_models.AbstractUser):
 
 class Quiz(models.Model):
     title       = models.CharField(max_length=32, unique=True)
-    description = models.CharField(max_length=256)
+    description = models.CharField(max_length=256, null=True, blank=True)
 
     def __str__(self):
         return self.title
