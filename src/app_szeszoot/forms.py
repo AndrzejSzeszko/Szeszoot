@@ -7,11 +7,14 @@ from django.contrib.auth.forms import (
     UserChangeForm,
 )
 from .models import (
+    Game,
     Quiz,
     Question,
     Answer,
     Player,
 )
+from django.forms.fields import validators
+
 
 class SignInForm(UserCreationForm):
     email = forms.EmailField()
@@ -29,7 +32,7 @@ class UpdateCustomUserForm(UserChangeForm):
 
 class QuizForm(forms.ModelForm):
     class Meta:
-        model = Quiz
+        model  = Quiz
         fields = '__all__'
 
 
@@ -39,23 +42,42 @@ class QuestionForm(forms.ModelForm):
         exclude = ['quiz']
 
 
-class AnswerForm(forms.ModelForm):
+class CorrectAnswerForm(forms.ModelForm):
+    answer_content = forms.CharField(max_length=256, label='Correct answer')
+
     class Meta:
-        model = Answer
+        model  = Answer
+        fields = ['answer_content']
+
+
+class InorrectAnswerForm(forms.ModelForm):
+    answer_content = forms.CharField(max_length=256, label='Inorrect answer')
+
+    class Meta:
+        model  = Answer
         fields = ['answer_content']
 
 
 class QuestionAnswerForm(MultiModelForm):
     form_classes = {
         'question': QuestionForm,
-        'answer1': AnswerForm,
-        'answer2': AnswerForm,
-        'answer3': AnswerForm,
-        'answer4': AnswerForm,
+        'answer1': CorrectAnswerForm,
+        'answer2': InorrectAnswerForm,
+        'answer3': InorrectAnswerForm,
+        'answer4': InorrectAnswerForm,
     }
 
 
 class PlayerForm(forms.ModelForm):
+    nickname = forms.CharField(
+        max_length=32,
+        validators=[validators.RegexValidator(
+            regex='^[a-zA-Z0-9_]*$',
+            message='Only underscores (_) and  alphanumeric (a-z, A-Z, 0-9) characters are allowed.'
+        )],
+    )
+    game     = forms.ModelChoiceField(queryset=Game.objects.all(), widget=forms.NumberInput, label='Game id')
+
     class Meta:
         model   = Player
         exclude = ['user']
