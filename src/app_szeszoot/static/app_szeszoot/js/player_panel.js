@@ -107,6 +107,6 @@ function activateButtons(buttons, message) {
 
 
 function displayRank(message) {
-    let rank = message['from_master']['arrayOfWinners'].indexOf(`${nickname}`);
-    alert(`Congratulations! You ranked number ${rank + 1}!`);
+    let rank = message['from_master']['arrayOfWinners'].indexOf(`${nickname}`) + 1;
+    alert(`Congratulations! You ranked number ${rank}!`);
 }

@@ -93,3 +93,7 @@ a.article-title:hover {
     word-break: normal;
     white-space: normal;
 }
+
+#alpha {
+    font-size: 50%;
+}
