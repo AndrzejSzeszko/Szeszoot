@@ -39,7 +39,7 @@ class QuizForm(forms.ModelForm):
 class QuestionForm(forms.ModelForm):
     class Meta:
         model   = Question
-        exclude = ['quiz']
+        exclude = ['quiz', 'image']
 
 
 class CorrectAnswerForm(forms.ModelForm):
