@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import json
+
+with open('/home/andrzej_hp/PycharmProjects/Szeszoot/szeszoot_config.json') as config_file:
+    config = json.loads(config_file)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '51h)3q(jslk*m*+_h3q3$pe2d7mqui4%+3_hi!=(+6mf)=)^x%'
+SECRET_KEY = config['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -84,9 +88,9 @@ WSGI_APPLICATION = 'Szeszoot.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'szeszoot',
-        'USER': 'postgres',
-        'PASSWORD': 'coderslab',
+        'NAME': config['DB_NAME'],
+        'USER': config['DB_USER'],
+        'PASSWORD': config['DB_USER_PASS'],
         'HOST': '127.0.0.1',
     }
 }
