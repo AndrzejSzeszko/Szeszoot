@@ -16,7 +16,7 @@ import json
 # replace path in open('') with path to your szeszoot_config.json file.
 #
 with open('/home/andrzej_hp/PycharmProjects/Szeszoot/my_szeszoot_config.json') as config_file:
-    config = json.loads(config_file)
+    config = json.load(config_file)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -1,6 +1,3 @@
-// place values of variables within apropriate quotes
-// youu can generate your own SECRET_KEY eg. here: https://www.miniwebtool.com/django-secret-key-generator/
-
 {
   "SECRET_KEY": "<place your variable value within this quotes or make quotes empty if you don't need it>",
   "EMAIL_USER": "<place your variable value within this quotes or make quotes empty if you don't need it>",
