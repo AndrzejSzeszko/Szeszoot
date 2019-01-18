@@ -18,37 +18,35 @@ HAVE FUN!
 
 Screens:
 
-Choosing Quiz
+Choosing Quiz<br>
 <img src="pics_for_readme/choose_quiz.png" height="400">
 
-Joining the game
+Joining the game<br>
 <img src="pics_for_readme/joinning_the_game.png" height="400">
 
-Waiting for firs question
+Waiting for firs question<br>
 <img src="pics_for_readme/inactive_buttons.png" height="400">
 
-All players are ready
+All players are ready<br>
 <img src="pics_for_readme/all_players_ready.png" height="400">
 
-First question
+First question<br>
 <img src="pics_for_readme/nobody_answers_yet.png" height="400">
 
-Player has answered
+Player has answered<br>
 <img src="pics_for_readme/blocked_buttons_with_answer.png" height="400">
 
-Time to answer
+Time to answer<br>
 <img src="pics_for_readme/active_buttons.png" height="400">
 
-Player hasn't answered
+Player hasn't answered<br>
 <img src="pics_for_readme/blocked_buttons_without_answer.png" height="400">
 
-Players has answered
+Players has answered<br>
 <img src="pics_for_readme/all_answers_correct.png" height="400">
 
-Results!
+Results!<br>
 <img src="pics_for_readme/ranks_list_info.png" height="400">
 
-Congratulations!
+Congratulations!<br>
 <img src="pics_for_readme/rank_info.png" height="400">
-
-
