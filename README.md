@@ -18,37 +18,35 @@ HAVE FUN!
 
 Screens:
 
-Choosing Quiz
-![choose_quiz](pics_for_readme/choose_quiz.png)
+Choosing Quiz<br>
+<img src="pics_for_readme/choose_quiz.png" height="400">
 
-Joining the game
-![joining_the_game](pics_for_readme/joinning_the_game.png)
+Joining the game<br>
+<img src="pics_for_readme/joinning_the_game.png" height="400">
 
-Waiting for firs question
-![inactive_buttons](pics_for_readme/inactive_buttons.png)
+Waiting for firs question<br>
+<img src="pics_for_readme/inactive_buttons.png" height="400">
 
-All players are ready
-![all_players_ready](pics_for_readme/all_players_ready.png)
+All players are ready<br>
+<img src="pics_for_readme/all_players_ready.png" height="400">
 
-First question
-![nobody_answered_yet](pics_for_readme/nobody_answers_yet.png)
+First question<br>
+<img src="pics_for_readme/nobody_answers_yet.png" height="400">
 
-Player has answered
-![blocked_button_with_an_answer](pics_for_readme/blocked_buttons_with_answer.png)
+Player has answered<br>
+<img src="pics_for_readme/blocked_buttons_with_answer.png" height="400">
 
-Time to answer
-![actice_buttons](pics_for_readme/active_buttons.png)
+Time to answer<br>
+<img src="pics_for_readme/active_buttons.png" height="400">
 
-Player hasn't answered
-![blocked_button_without_answer](pics_for_readme/blocked_buttons_without_answer.png)
+Player hasn't answered<br>
+<img src="pics_for_readme/blocked_buttons_without_answer.png" height="400">
 
-Players has answered
-![all_answers_correct](pics_for_readme/all_answers_correct.png)
+Players has answered<br>
+<img src="pics_for_readme/all_answers_correct.png" height="400">
 
-Results!
-![ranks_list](pics_for_readme/ranks_list_info.png)
+Results!<br>
+<img src="pics_for_readme/ranks_list_info.png" height="400">
 
-Congratulations!
-![rank_info](pics_for_readme/rank_info.png)
-
-
+Congratulations!<br>
+<img src="pics_for_readme/rank_info.png" height="400">
