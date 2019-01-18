@@ -23,6 +23,7 @@ Choosing Quiz
 
 Joining the game
 ![joining_the_game](pics_for_readme/joinning_the_game.png)
+<img src="pics_for_readme/joinning_the_game.png" width="100">
 
 Waiting for firs question
 ![inactive_buttons](pics_for_readme/inactive_buttons.png)
