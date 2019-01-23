@@ -1,9 +1,24 @@
 {% extends 'app_szeszoot/base.html' %}
-
+{% load static %}
 
 {% block content %}
     <h4>Welcome to Szeszoot!</h4>
     <p><strong>Known issues with Safari!</strong> If you want to avoid them please use some other browser (we recommend any chromium-based one).</p>
-    <p>We're gonna solve it sooner or later!</p>
+    <p>We're gonna fix it sooner or later!</p>
     <p>If you have any remarks please open an issue on project's <a href="https://github.com/AndrzejSzeszko/Szeszoot">github page.</a></p>
+    <div class="multiline">
+        Usage:
+        1) As a Game Master click "Set up game" (you must be logged in)
+        2) Then choose one of available quizzes
+        3) On the Game Master Panel that appears, there is game id. Share it with players you want to join the game.
+        4) Wait for the players to join (their nicknames will appear on the Game Master Panel)
+        5) As a Player, click "Play!" (you don't have to be logged in)
+        6) Then type your nickname of choice and game id you want to join
+        7) Click "Join"
+        8) As a Game Master click "Start!" once all players have joined the game
+        9) Click "Next Question!" when you want to push next question to Players
+        10) Rest of steps is quite intuitive :)
+
+        HAVE FUN!
+    </div>
 {% endblock content %}
