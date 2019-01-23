@@ -2,6 +2,8 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -16,4 +18,4 @@ urlpatterns = [
     path('game_master_panel/<int:game_pk>/', views.GameMasterPanelView.as_view(), name='game-master-panel'),
     path('player_create/', views.PlayerCreateView.as_view(), name='player-create'),
     path('player_panel/<int:pk>/', views.PlayerPanelView.as_view(), name='player-panel'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

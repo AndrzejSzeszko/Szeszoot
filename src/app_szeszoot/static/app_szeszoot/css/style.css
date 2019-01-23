@@ -94,6 +94,10 @@ a.article-title:hover {
     white-space: normal;
 }
 
+.multiline {
+    white-space: pre-line;
+}
+
 #alpha {
     font-size: 50%;
 }
