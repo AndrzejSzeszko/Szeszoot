@@ -62,4 +62,4 @@ Congratulations!<br>
 - improve ending pop-up (via bootstrap modals)
 - editing and deleting quizzes
 - access control to some quizzes
-- add valid-answer-is-the-one-which-was-answered-most-frequently mode
+- add valid-answer-is-the-one-which-was-answered-the-most-frequently mode
