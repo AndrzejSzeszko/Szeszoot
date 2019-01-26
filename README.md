@@ -63,3 +63,4 @@ Congratulations!<br>
 - editing and deleting quizzes
 - access control to some quizzes
 - add valid-answer-is-the-one-which-was-answered-the-most-frequently mode
+- pagination where needed
