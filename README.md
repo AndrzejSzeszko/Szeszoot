@@ -3,7 +3,7 @@ This is Kahoot-like app made by myself. (in development)
 
 <a href="http://139.162.187.56/">Link to deployed version</a>
 
-Usage:
+## Usage:
 1) As a Game Master click "Set up game" (you must be logged in)
 2) Then choose one of available quizzes
 3) On the Game Master Panel that appears, there is game id. Share it with players you want to join the game.
@@ -17,7 +17,7 @@ Usage:
 
 HAVE FUN!
 
-Screens:
+## Screens:
 
 Choosing Quiz<br>
 <img src="pics_for_readme/choose_quiz.png" height="400">
@@ -51,3 +51,14 @@ Results!<br>
 
 Congratulations!<br>
 <img src="pics_for_readme/rank_info.png" height="400">
+
+## To do:
+- fix Safari issues
+- fix adding quiz description
+- editing and deleting account
+- password resetting via email
+- improve ending pop-up (via bootstrap modals)
+- editing and deleting quizzes
+- access control to some quizzes
+- add valid-answer-is-the-one-which-was-answered-the-most-frequently mode
+- pagination where needed
