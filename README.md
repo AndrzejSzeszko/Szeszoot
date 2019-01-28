@@ -53,8 +53,6 @@ Congratulations!<br>
 <img src="pics_for_readme/rank_info.png" height="400">
 
 ## To do:
-- SSL cerificate
-- domain name
 - fix Safari issues
 - fix adding quiz description
 - editing and deleting account
