@@ -1,7 +1,7 @@
 # Szeszoot
 This is Kahoot-like app made by myself. (in development)
 
-<a href="http://139.162.187.56/">Link to deployed version</a>
+<a href="http://szeszoot.pl">Link to deployed version</a>
 
 ## Usage:
 1) As a Game Master click "Set up game" (you must be logged in)
